@@ -416,11 +416,17 @@ uint8_t* hexToBytes(const std::string& hex)
 
 int main(int argc, char* argv[])
 {
-    uint8_t* bytecodeHash = hexToBytes("0x690f45ae7b3433ad0918598d7d1cf6864ac095b0b374e85e7330e951280f328a");
-    uint8_t* addr = hexToBytes("0x978BeCF0AEE83e6a2B93e48654250D106B6B7112");
-    uint8_t* find_addr = hexToBytes("0xfee0000000");
+    printf("Grolol is happy :)\n");
+    if (argc != 4) {
+        printf("You're stupid!");
+        return -1;
+    }
 
-    cudaError_t cudaStatus = find_keccak_salt(addr, bytecodeHash, find_addr, 3);
+    uint8_t* bytecodeHash = hexToBytes(argv[1]);
+    uint8_t* addr = hexToBytes(argv[2]);
+    uint8_t* find_addr = hexToBytes(argv[3]); //0xBABA00  0x5AA5A000 0xBA00BA00
+
+    cudaError_t cudaStatus = find_keccak_salt(addr, bytecodeHash, find_addr, 4);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "ohhhh");
     }
@@ -428,6 +434,7 @@ int main(int argc, char* argv[])
     delete[] bytecodeHash;
     delete[] addr;
     delete[] find_addr;
+    return 0;
 }
 
 
