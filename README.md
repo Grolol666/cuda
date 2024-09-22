@@ -1,4 +1,4 @@
-#CUDA exrcice
+##CUDA exrcice
 
 the MineKeccak256 is just an exercise to learn cuda.
 
