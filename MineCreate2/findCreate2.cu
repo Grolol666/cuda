@@ -332,7 +332,7 @@ uint8_t* cuda_init(uint8_t* pData, size_t s) {
 #define END_TIMER(timer, msg)                                                                                          \
   printf("%s: %.0f ms\n", msg, FpMilliseconds(std::chrono::high_resolution_clock::now() - timer##_start).count());
 
-extern "C" cudaError_t find_keccak_salt(uint8_t * addr, uint8_t * bytecodehash, uint8_t * addrToFind, const uint32_t sizeToCmp)
+extern "C" cudaError_t find_keccak_salt(uint8_t * addr, uint8_t * bytecodehash, uint8_t * addrToFind, const size_t sizeToCmp)
 {
     using FpMilliseconds = std::chrono::duration<float, std::chrono::milliseconds::period>;
     using FpMicroseconds = std::chrono::duration<float, std::chrono::microseconds::period>;
@@ -371,7 +371,7 @@ extern "C" cudaError_t find_keccak_salt(uint8_t * addr, uint8_t * bytecodehash, 
     if (cudaStatus != cudaSuccess) return cudaStatus;
     */
     START_TIMER(find_keccak_timer);
-    find_keccak <<<N_BLOCK, N_THREAD>>>(p_ADDR, p_bytecodehash, p_addrToFind, sizeToCmp, p_result);
+    find_keccak <<<N_BLOCK, N_THREAD>>>(p_ADDR, p_bytecodehash, p_addrToFind, (uint32_t)sizeToCmp, p_result);
     cudaStatus = cudaDeviceSynchronize();
     cudaStatus = cudaGetLastError();
     if (cudaStatus != cudaSuccess) {
@@ -421,12 +421,17 @@ int main(int argc, char* argv[])
         printf("You're stupid!");
         return -1;
     }
+    std::string st = argv[3];
+    if (st.size() / 2 < 2) {
+        printf("You're stupid!");
+        return -1;
+    }
 
     uint8_t* bytecodeHash = hexToBytes(argv[1]);
     uint8_t* addr = hexToBytes(argv[2]);
-    uint8_t* find_addr = hexToBytes(argv[3]); //0xBABA00  0x5AA5A000 0xBA00BA00
+    uint8_t* find_addr = hexToBytes(argv[3]); //0xBABA00 0x5AA5A000 0xBA00BA00
 
-    cudaError_t cudaStatus = find_keccak_salt(addr, bytecodeHash, find_addr, 4);
+    cudaError_t cudaStatus = find_keccak_salt(addr, bytecodeHash, find_addr, (st.size() / 2) - 1 );
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "ohhhh");
     }
